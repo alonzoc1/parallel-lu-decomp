@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// set to true to verify the matrix is being read in as expected
 const bool PRINT_MATRIX_BEFORE = true;
 
 void free_dynamic_array(int** arr, int rows) {
