@@ -6,7 +6,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "eigen/Eigen/Dense"
+#include "eigen/Eigen/Sparse"
+#include "fmm/app/Eigen.hpp"
 
 int** readCSV(std::string& filename, int size);
+
+Eigen::MatrixXf read_matrix_market(std::string filename);
 
 #endif

@@ -25,20 +25,17 @@ void print_matrix(int** arr, int size) {
     }
 }
 
+void lu_decomposition(int** data, int size) {
+}
+
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        cerr << "To use this function, provide a <filename.csv> and <matrix_size>" << endl;
-        cerr << "Usage: " << argv[0] << " <filename.csv>" << " <matrix_size>" << endl;
+    if (argc != 2) {
+        cerr << "To use this function, provide a <filename.mtx>" << endl;
+        cerr << "Usage: " << argv[0] << " <filename.mtx>" << endl;
         return 1;
     }
-
     string filename = argv[1];
-    int matrix_size = stoi(argv[2]);
-    int** result = readCSV(filename, matrix_size);
-    if (PRINT_MATRIX_BEFORE) {
-        print_matrix(result, matrix_size);
-    }
-
-    free_dynamic_array(result, matrix_size);
+    Eigen::MatrixXf mat = read_matrix_market(filename);
+    cout << mat(1, 1) << endl;
     return 0;
 }
