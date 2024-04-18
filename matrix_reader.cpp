@@ -41,8 +41,17 @@ int** readCSV(string& filename, int size) {
     return vectorTo2DArray(data, size, size);
 }
 
-/* // Uncomment this if you want to test matrix_reader on its own
+Eigen::MatrixXf read_matrix_market(string filename) {
+    std::ifstream f(filename);
+    Eigen::MatrixXf data;
+    fast_matrix_market::read_matrix_market_eigen_dense(f, data);
+    return data;
+}
+
+/*
+// Uncomment this if you want to test matrix_reader on its own
 int main (int argc, char* argv[]) {
+    // Testing CSV
     if (argc != 3) {
         cerr << "To use this function, provide a <filename.csv> and <matrix_size>" << endl;
         cerr << "Usage: " << argv[0] << "<filename.csv>" << " " << "<matrix_size>" << endl;
@@ -54,6 +63,17 @@ int main (int argc, char* argv[]) {
         delete[] result[i];
     }
     delete[] result;
+    // Testing Matrix Market
+    if (argc != 2) {
+        cerr << "To use this function, provide a <filename>" << endl;
+        cerr << "Usage: " << argv[0] << "<filename>" << endl;
+        return 1;
+    }
+    string filename = argv[1];
+    std::ifstream f(filename);
+    Eigen::MatrixXf data;
+    fast_matrix_market::read_matrix_market_eigen_dense(f, data);
+    cout << data(0, 0) << endl;
     return 0;
 }
 */
