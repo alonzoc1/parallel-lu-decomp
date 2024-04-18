@@ -11,7 +11,7 @@
 #pragma clang diagnostic ignored "-Wunused-but-set-variable"
 #endif
 
-#include "../../eigen/Eigen/Sparse"
+#include "../../Eigen/Sparse"
 
 
 
