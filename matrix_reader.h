@@ -6,8 +6,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "eigen/Eigen/Dense"
-#include "eigen/Eigen/Sparse"
+#include "Eigen/Dense"
+#include "Eigen/Sparse"
 #include "fmm/app/Eigen.hpp"
 
 int** readCSV(std::string& filename, int size);
