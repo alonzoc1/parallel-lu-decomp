@@ -13,5 +13,6 @@
 int** readCSV(std::string& filename, int size);
 
 Eigen::MatrixXf read_matrix_market(std::string filename);
+Eigen::MatrixXf load_csv (const std::string & path);
 
 #endif
