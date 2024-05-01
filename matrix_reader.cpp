@@ -74,6 +74,22 @@ Eigen::MatrixXf read_matrix_market(string filename) {
     return data;
 }
 
+// fills md c array from csv. no bounds checking, ensure csv is same size as result
+void load_csv(const std::string& path, float*& result) {
+    std::ifstream indata;
+    indata.open(path);
+    std::string line;
+    unsigned long mem_counter = 0;
+    while (std::getline(indata, line)) {
+        std::stringstream lineStream(line);
+        std::string cell;
+        while (std::getline(lineStream, cell, ',')) {
+            result[mem_counter] = std::stof(cell);
+            mem_counter++;
+        }
+    }
+}
+
 /*
 // Uncomment this if you want to test matrix_reader on its own
 int main (int argc, char* argv[]) {

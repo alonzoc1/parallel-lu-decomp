@@ -50,6 +50,9 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MatrixXf mat = MatrixXf::Ones(stol(argv[2]), stol(argv[2])); // initializes the memory space in each process
     unsigned long n = stoul(argv[2]);
+    double timing;
+    string ext;
+    string filename;
 
     if (rank == 0) {
         // load the matrix from the arguments
@@ -59,8 +62,8 @@ int main(int argc, char *argv[]) {
             cout << "n is the square size of the matrix (i.e. a 3x3 matrix is n=3)" << endl;
             return 1;
         }
-        string filename = argv[1];
-        string ext = filename.substr(filename.find_last_of(".") + 1);
+        filename = argv[1];
+        ext = filename.substr(filename.find_last_of(".") + 1);
         transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c){ return std::tolower(c); });
         if (ext == "csv") {
             mat = load_csv(filename);
@@ -73,8 +76,10 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         // print input
-        cout << "Input mat: " << endl;
-        cout << mat << endl;
+        //cout << "Input mat: " << endl;
+        //cout << mat << endl;
+        cout << "Starting timer..." << endl;
+        timing = MPI_Wtime();
     }
     // give data to processes
     MPI_Bcast(mat.data(), n*n, MPI_FLOAT, 0, MPI_COMM_WORLD);
@@ -84,16 +89,17 @@ int main(int argc, char *argv[]) {
     MPI_Gather(mat.data(), (n*n) / procs, MPI_FLOAT, mat.data(), (n*n) / procs, MPI_FLOAT, 0, MPI_COMM_WORLD);
     // print result
     if (rank == 0) {
+        timing = MPI_Wtime() - timing;
+        cout << "Ending timer..." << endl;
         MatrixXf L;
         MatrixXf U;
         split_lu(mat, L, U);
 
-        cout << "L: " << endl;
-        cout << L << endl;
-        cout << "U: " << endl;
-        cout << U << endl;
-        cout << "L * U:" << endl;
-        cout << (L * U) << endl;
+        // check correctness
+        MatrixXf reread = ext == "csv" ? load_csv(filename) : read_matrix_market(filename);
+        bool correct = reread.isApprox((L*U));
+        cout << "Correct answer: " << (correct ? "Yes" : "No") << endl;
+        cout << "Time: " << timing << endl;
     }
     MPI_Finalize();
     return 0;
