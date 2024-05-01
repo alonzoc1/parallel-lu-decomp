@@ -24,7 +24,7 @@ std::vector<int> split_row(const string& string_stream, char delim) {
     return toks;
 }
 
-int** readCSV(string& filename, int size) {
+int** readCSVOld(string& filename, int size) {
     ifstream file(filename);
     // We use vectors to dynamically read in the data
     std::vector<std::vector<int>> data;
@@ -41,11 +41,53 @@ int** readCSV(string& filename, int size) {
     return vectorTo2DArray(data, size, size);
 }
 
+/* helper for loading csv files for testing, assumes square */
+Eigen::MatrixXf load_csv (const std::string & path) {
+    std::ifstream indata;
+    indata.open(path);
+    std::string line;
+    std::vector<float> values;
+    long rows = 0;
+    while (std::getline(indata, line)) {
+        std::stringstream lineStream(line);
+        std::string cell;
+        while (std::getline(lineStream, cell, ',')) {
+            values.push_back(std::stod(cell));
+        }
+        ++rows;
+    }
+    std::vector<float> ordered;
+    long offset = 0;
+    for (long row_idx = 0; row_idx < rows; row_idx++) {
+        for (long col_idx = 0; col_idx < rows; col_idx++) {
+            ordered.push_back(values[(col_idx * rows) + row_idx]);
+        }
+    }
+    Eigen::MatrixXf result = Eigen::Map<Eigen::MatrixXf>(ordered.data(), rows, rows, Eigen::Stride<0, 0>());
+    return result;
+}
+
 Eigen::MatrixXf read_matrix_market(string filename) {
     std::ifstream f(filename);
     Eigen::MatrixXf data;
     fast_matrix_market::read_matrix_market_eigen_dense(f, data);
     return data;
+}
+
+// fills md c array from csv. no bounds checking, ensure csv is same size as result
+void load_csv(const std::string& path, float*& result) {
+    std::ifstream indata;
+    indata.open(path);
+    std::string line;
+    unsigned long mem_counter = 0;
+    while (std::getline(indata, line)) {
+        std::stringstream lineStream(line);
+        std::string cell;
+        while (std::getline(lineStream, cell, ',')) {
+            result[mem_counter] = std::stof(cell);
+            mem_counter++;
+        }
+    }
 }
 
 /*
