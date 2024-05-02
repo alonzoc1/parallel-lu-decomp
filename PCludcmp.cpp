@@ -6,12 +6,8 @@
 #include "Eigen/Dense"
 #include <cmath>
 #include <iostream>
-#ifdef _OPENMP
 #include <omp.h>
-#endif
-#ifdef _MPI
-#include <mpi.h>
-#endif
+
 #define PI 3.1415926
 
 using namespace std;
