@@ -1,0 +1,19 @@
+SIZE64ITER2
+Starting timer
+Stopping timer
+Time: 0.007588
+
+SIZE256ITER1
+Starting timer
+Stopping timer
+Time: 0.34293
+
+SIZE512ITER1
+Starting timer
+Stopping timer
+Time: 2.64932
+
+SIZE1024ITER0
+Starting timer
+Stopping timer
+Time: 20.8949

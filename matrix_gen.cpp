@@ -16,7 +16,7 @@ IOFormat CSV(StreamPrecision, DontAlignCols, ", ", "\n");
 /* Generate matrix of random values that is always invertible */
 void generate_random_matrix(int size, string filename) {
     // set seed from time
-    srand((unsigned int) time(0));
+    //srand((unsigned int) time(0));
     // generate random invertible matrix
     MatrixXf generated = MatrixXf::Random(size, size);
     generated = (generated + MatrixXf::Constant(size,size,1.))*(HIGH-LOW)/2;
