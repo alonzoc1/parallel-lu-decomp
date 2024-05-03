@@ -29,21 +29,21 @@ int main(int argc, char* argv[]) {
     AVG_OVER = stoi(argv[2]);
     string raw_filename = "raw_" + test_type + ".txt";
     string results_filename = "results_" + test_type + ".txt";
-    int test_sizes[5] = {64, 256, 512, 1024, 2048};
+    int test_sizes[4] = {64, 256, 512, 1024};
     // Generate data first
     
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
         for (int j = 0; j < AVG_OVER; j++) {
             cout << "Generating data for " << test_sizes[i] << " iteration " << j << endl;
             if (system(("./gen " + build_test_data_filename(j, test_sizes[i]) + " " + to_string(test_sizes[i])).c_str()) != 0) {
                 cout << "Generating data failed, exiting..." << endl;
                 return 1;
             }
-            sleep(1); // let seed increment
+            //sleep(1); // let seed increment
         }
     }
     // Run tests
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
         int test_size = test_sizes[i];
         // Start timer
         cout << "Starting timer for size: " << test_size << endl;
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
             cout << "--Iteration " << iter_tracker << endl;
             if (test_type == "serial") {
                 system(("echo SIZE" + to_string(test_size) + "ITER" + to_string(iter_tracker) + " >> " + raw_filename).c_str());
-                if (system(("./gaussian_serial " + build_test_data_filename(iter_tracker, test_size) + ">> " + raw_filename).c_str()) != 0) {
+                if (system(("./gaussian_serial " + build_test_data_filename(iter_tracker, test_size) + " >> " + raw_filename).c_str()) != 0) {
                     cout << "One of the tests failed, exiting..." << endl;
                 }
             } else if (test_type == "mpi") {
@@ -63,7 +63,11 @@ int main(int argc, char* argv[]) {
                         cout << "One of the tests failed, exiting..." << endl;
                     }
                 }
-
+            } else if(test_type == "omp"){
+                system(("echo SIZE" + to_string(test_size) + "ITER" + to_string(iter_tracker) + " >> " + raw_filename).c_str());
+                if (system(("./PCludcmp " + build_test_data_filename(iter_tracker, test_size) + " >> " + raw_filename).c_str()) != 0) {
+                    cout << "One of the tests failed, exiting..." << endl;
+                }
             }
         }
     }
