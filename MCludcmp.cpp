@@ -32,7 +32,6 @@ struct {
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-
     scaling = new double[n];
 
     // implicit scaling. We find the scaling factor and save it.
@@ -130,8 +129,8 @@ struct {
                 a(i, j) *= dum;
         }
     }
-
     MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Allgather(a.col(j).data(), end_col-start_col+1, MPI_DOUBLE, a.col(j).data(), end_col-start_col+1, MPI_DOUBLE, MPI_COMM_WORLD);
 }
 
 template <typename Derived>
@@ -183,13 +182,15 @@ int main(int argc, char **argv) {
     // PartialPivLU<Ref<RowMajorMatrixXd>> lu(a);
     // cout << a.col(1).maxCoeff(&index) << " index" << index << endl;
     MCludcmp(a, n, indx);
-    MPI_Finalize();
+    
     if(my_rank == 0){
         std::cout << a << endl; // print our version
         backsub(a, n, indx, b);
         Map<Matrix4d>m(b);
         cout << m << endl;
     }
+
+    MPI_Finalize();
     
     return 0;
 }

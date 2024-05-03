@@ -24,7 +24,6 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
     // MPI_Init()
 
     scaling = new double[n];
-
     // implicit scaling. We find the scaling factor and save it.
     // no actual scaling is made here. Row i is implicitly scaled by scaling[i]
 #pragma omp parallel for default(none) private(i, big) shared(scaling, a, n)
@@ -42,18 +41,17 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
 // build upper trianfular part up to j-1 row since eache thread will have its own set of i's,
 // no overlap the a(k,j) term would have already been build in previous iterations of j
 #pragma omp parallel for default(none) private(i, k, sum) shared(a, j)         \
-    schedule(guided)
+    schedule(dynamic)
         for (i = 0; i < j; i++) {
             sum = a(i, j);
             for (k = 0; k < i; k++)
-               
                 sum -= a(i, k) * a(k, j); // we are not reducing to sum
 
             a(i, j) = sum;
         }
     
 #pragma omp parallel for default(none) private(i, sum, k)                      \
-    shared(a, j, n, big, imax, cout) schedule(static)
+    shared(a, j, n, big, imax, cout) schedule(dynamic)
         for (i = j; i < n; i++) {
             sum = a(i, j);
             for (k = 0; k < j; k++)
@@ -61,7 +59,7 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
 
             a(i, j) = sum;
             // if(j == n-1) // print a(n,n)
-            cout << "a_ij " << i << "," << j << " " << a(i, j) << endl;
+            //cout << "a_ij " << i << "," << j << " " << a(i, j) << endl;
         }
 
         // look for pivot. This area is not worth parallelizing since we will have to make the
