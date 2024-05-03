@@ -1,0 +1,191 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fullpage}
+\usepackage[top=2cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{physics}
+\usepackage{MnSymbol}
+\usepackage{float}
+
+\usepackage{listings} %for listings of the source code
+
+% Some definitions for using the listing package.
+% When we reference 'codegreen', it will be the RGB color defined below.
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Also for the listings, this will make the code listing look like default MATLAB
+%\lstdefinestyle{mystyle}{
+%	backgroundcolor=\color{backcolour},
+%	commentstyle=\color{codegreen},
+%	keywordstyle=\color{magenta},
+%	numberstyle=\tiny\color{codegray},
+%	stringstyle=\color{codepurple},
+%	basicstyle=\footnotesize,
+%	breakatwhitespace=false,
+%	breaklines=true,
+%	captionpos=b,
+%	keepspaces=true,
+%	numbers=left,
+%	numbersep=5pt,
+%	showspaces=false,
+%	showstringspaces=false,
+%	showtabs=false,
+%	tabsize=2
+%}
+\lstset{language=C++,
+	basicstyle=\footnotesize,
+	keywordstyle=\color{blue}\ttfamily,
+	stringstyle=\color{red}\ttfamily,
+	commentstyle=\color{green}\ttfamily,
+	morecomment=[l][\color{magenta}]{\#},
+    backgroundcolor=\color{backcolour},
+    tabsize=2,
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+}
+
+\hypersetup{%
+  colorlinks=true,
+  linkcolor=blue,
+  linkbordercolor={0 0 1}
+}
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+
+% Edit these as appropriate
+\newcommand\course{COMP-605}
+\newcommand\hwnumber{Final Report}                  % <-- homework number
+\newcommand\NetIDa{Raul L Bernal-Gonzalez}       % <-- NetID of person #1
+\newcommand\NetIDb{Alonzo Castanon}           % <-- NetID of person #2 (Comment this line out for problem sets)
+
+\pagestyle{fancyplain}
+\headheight 15pt
+\lhead{\NetIDa}
+\lhead{\NetIDa\\\NetIDb}                 % <-- Comment this line out for problem sets (make sure you are person #1)
+\chead{\textbf{\Large  \hwnumber}}
+\rhead{\course \\ \today}
+\lfoot{}
+\cfoot{}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Parallelization of LU Decomposition} % Note the asteric so you do not get an additional number
+
+LU-decomposition is a popular method of solving a linear system of equations with out having to invert a matrix. Any invertible matrix \(A\) can be factorized into an lower and upper triangular part. These \(L\) and \(U\) matrices can then be used to solve the \(A\vec{x} = \vec{b} \). This method is illustrated in the following:
+
+\begin{align}
+		&A\vec{x} = \vec{b} \\
+	&(LU)\vec{x} = \vec{b} \\
+	&L\vec{y} = \vec{b} \\
+	&\vec{y} = L^{-1}\vec{b} \\
+	&\vec{y} = U\vec{x}
+\end{align}
+
+Two popular algorithms for LU decomposition are Crout's and Gauss-Elimination.
+
+\section{Crout's Algorithm}
+   This method solves for the upper triangular part of the LU decomposition in a ``$\righthalfcup$" shape. It first computes the upper triangular part then then uses those values to create the lower triangular part. The algorithm iterates through columns of the matrix, going down each row of the column. This method is depicted in figure \ref{fig:crout}. The algorithm is ``in place'' with each iteration replacing the data in \(A\) with the LU decomposition. This is illustrated in equation \ref{lu-matrix}
+
+   \begin{align}\label{lu-matrix}
+   	\mqty[\xmat*{a}{4}{4}] \rightarrow  \mqty[\beta_{11} & \beta_{12} & \beta_{13} & \beta_{14} \\
+   	\alpha_{21} & \beta_{22} & \beta_{23} & \beta_{24} \\
+   	\alpha_{31} & \alpha_{32} & \beta_{33} & \beta_{34} \\
+   	\alpha_{41} & \alpha_{42} & \alpha_{43} & \beta_{44} \\]
+   \end{align}
+
+   \begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.7\linewidth]{"../../../../../Desktop/Screenshot 2024-05-02 at 7.55.50 PM"}
+%   	\caption{}
+   	\label{fig:crout}
+   \end{figure}
+
+
+	\subsection{Parallelization}
+	We decided to apply parallelization to the Numerical Recipes version of the Crouts's algorithm. The parallelization of this algorithm is fairly straight forward with OpenMP. We parallelized over the inner loops that go through the rows of each column. This was the best way to parallelized with OpenMP because it minimizes communication between threads. If we had parallelized over the main loop that iterates over the columns, we would have had to pass messages between threads because we need the all the columns \(< j\) to build the \(j^{th}\) column. The code for the openMP parallelization is shown below.
+
+    \lstset{caption={Crout's algorithm parallelize with OpenMP. Adapted from Numerical Recipes}}
+     \begin{lstlisting}
+#pragma omp parallel for default(none) private(i, big) shared(scaling, a, n)
+for (i = 0; i < n; i++) {
+// Find the max abs(value) of each row
+// detect if matrix is singular
+    big = a.row(i).cwiseAbs().maxCoeff();
+    if (big == 0.0) {
+        printf("Singular matrix in routine ludcmp");
+        exit(1);
+    }
+    scaling[i] = 1.0 / big;
+}
+// main crout's loop. iterate by column
+for (j = 0; j < n; j++) {
+    // build upper trianfular part up to j-1 row since eache thread will have its own set of i's,
+    // no overlap the a(k,j) term would have already been build in previous iterations of j
+#pragma omp parallel for default(none) private(i, k, sum) shared(a, j) schedule(dynamic)
+  	for (i = 0; i < j; i++) {
+  		sum = a(i, j);
+  		for (k = 0; k < i; k++)
+  			sum -= a(i, k) * a(k, j); // we are not reducing to sum
+  		a(i, j) = sum;
+  	}
+  	// continue to build upper triangular part from i = j up to n rows
+ #pragma omp parallel for default(none) private(i, sum, k) shared(a, j, n, big, imax, cout) schedule(dynamic)
+  	for (i = j; i < n; i++) {
+  		sum = a(i, j);
+  		for (k = 0; k < j; k++)
+  			sum -= a(i, k) * a(k, j);
+  		a(i, j) = sum;
+  	}
+  	// look for pivot. This area is not worth parallelizing since we will have to make the
+  	// conditional a critical section. We interested in the row-index of max(big), not it's value.
+  	// the operatio is scalar-scalar multiplication
+  	big = 0.0;
+  	for (i = j; i < n; i++) {
+  		dum = scaling[i] * abs(a(i, j));
+  		if (dum >= big) {
+  			big = dum;
+  			imax = i;
+  		}
+  	}
+  	// swap pivot rows. No parallelization
+  	if (j != imax) {
+  		a.row(imax).swap(a.row(j));
+  		scaling[imax] = scaling[j];
+  	}
+  	indx[j] = imax; // needed for backsubtitution if solveing Ax = b
+  	if (a(j, j) == 0.0){
+        printf("Singular matrix in routine ludcmp");
+        exit(1);
+      }
+  	if (j != n - 1) {
+  		dum = (1.0 / a(j, j));
+  		// this last part build lower triangular part using the values we calculated above
+#pragma omp parallel for default(none) private(i, k) shared(j, n, a, dum)
+  		for (i = j + 1; i < n; i++)
+  		a(i, j) *= dum;
+  	}
+  }
+    \end{lstlisting}
+
+The first loop simply finds the max absolute value of each row and stores it for future use. The first 2 loops use a dynamic scheduling because the number of iterations in the inner loops depend on the outer index; therefore threads with larger assigned indices will do less iterations. The pivoting part was left in serial because the conditional statement needs to be run by a single thread at a time to ensure the last thread to update imax is the thread with the max value. The swapping of the rows is also easier to handle in serial.
+
+\subsection{Performance and Results}
+The code was tested against Eigen's C++ Library LU decomposition algorithm for correctness with random matrices. The times were also measured using random matrices of size \(64, 256, 512,\) and \(1024\). LU decomposition was performed 3 times on each matrix and the max time was recorded.
+\section*{Problem 2}
+ I use \href{http://texstudio.sourceforge.net/}{\TeX studio}, but \href{https://www.overleaf.com/project}{Overleaf} and \href{https://www.xm1math.net/texmaker/}{\TeX maker} are also popular.
+
+\end{document}
