@@ -184,7 +184,7 @@ for (j = 0; j < n; j++) {
 The first loop simply finds the max absolute value of each row and stores it for future use. The first 2 loops use a dynamic scheduling because the number of iterations in the inner loops depend on the outer index; therefore threads with larger assigned indices will do less iterations. The pivoting part was left in serial because the conditional statement needs to be run by a single thread at a time to ensure the last thread to update imax is the thread with the max value. The swapping of the rows is also easier to handle in serial.
 
 \subsection{Performance and Results}
-The code was tested against Eigen's C++ Library LU decomposition algorithm for correctness with random matrices. The times were also measured using random matrices of size \(64, 256, 512,\) and \(1024\). LU decomposition was performed 3 times on each matrix and the max time was recorded.
+The code was tested against Eigen's C++ Library LU decomposition algorithm for correctness with random matrices. The times were also measured using random matrices of size \(64, 256, 512,\) and \(1024\). LU decomposition was performed 3 times on each matrix and the minimum time was recorded.
 \section*{Problem 2}
  I use \href{http://texstudio.sourceforge.net/}{\TeX studio}, but \href{https://www.overleaf.com/project}{Overleaf} and \href{https://www.xm1math.net/texmaker/}{\TeX maker} are also popular.
 

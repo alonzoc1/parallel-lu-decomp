@@ -8,14 +8,11 @@
 #include <iostream>
 #include <omp.h>
 #include <string>
-#ifndef BOOST_TIMER_ENABLE_DEPRECATED
-#define BOOST_TIMER_ENABLE_DEPRECATED
-#endif
-//#include <boost/timer.hpp>
-#include<chrono>
+// #include <boost/timer.hpp>
 #include "matrix_reader.h"
+#include <chrono>
 
-//#define PI 3.1415926
+// #define PI 3.1415926
 
 using namespace std;
 using namespace Eigen;
@@ -26,9 +23,6 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
     double big, dum, sum;
     double *scaling;
     double TINY = 1.0e-20;
-    // mpi parameters
-    int comm_sz, my_rank;
-    // MPI_Init()
 
     scaling = new double[n];
     // implicit scaling. We find the scaling factor and save it.
@@ -45,8 +39,9 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
 
     // main crout's loop. iterate by column
     for (j = 0; j < n; j++) {
-// build upper trianfular part up to j-1 row since eache thread will have its own set of i's,
-// no overlap the a(k,j) term would have already been build in previous iterations of j
+// build upper trianfular part up to j-1 row since eache thread will have its
+// own set of i's, no overlap the a(k,j) term would have already been build in
+// previous iterations of j
 #pragma omp parallel for default(none) private(i, k, sum) shared(a, j)
         for (i = 0; i < j; i++) {
             sum = a(i, j);
@@ -55,7 +50,7 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
 
             a(i, j) = sum;
         }
-    
+
 #pragma omp parallel for default(none) private(i, sum, k)                      \
     shared(a, j, n, big, imax, cout)
         for (i = j; i < n; i++) {
@@ -65,12 +60,13 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
 
             a(i, j) = sum;
             // if(j == n-1) // print a(n,n)
-            //cout << "a_ij " << i << "," << j << " " << a(i, j) << endl;
+            // cout << "a_ij " << i << "," << j << " " << a(i, j) << endl;
         }
 
-        // look for pivot. This area is not worth parallelizing since we will have to make the
-        // conditional a critical section. We interested in the row-index of max(big), not it's value.
-        // the operatio is scalar-scalar multiplication
+        // look for pivot. This area is not worth parallelizing since we will
+        // have to make the conditional a critical section. We interested in the
+        // row-index of max(big), not it's value. the operatio is scalar-scalar
+        // multiplication
         big = 0.0;
         for (i = j; i < n; i++) {
             dum = scaling[i] * abs(a(i, j));
@@ -87,8 +83,10 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
         }
 
         indx[j] = imax; // needed for backsubtitution if solveing Ax = b
-        if (a(j, j) == 0.0)
-            a(j, j) = TINY;
+        if (a(j, j) == 0.0){
+            printf("Singular matrix in routine ludcmp");
+            exit(1);
+        }
         if (j != n - 1) {
             dum = (1.0 / a(j, j));
 #pragma omp parallel for default(none) private(i, k) shared(j, n, a, dum)
@@ -96,6 +94,7 @@ void PCludcmp(MatrixBase<Derived> &a, long n, int *indx) {
                 a(i, j) *= dum;
         }
     }
+    delete[] scaling;
 }
 
 template <typename Derived>
@@ -121,31 +120,42 @@ void backsub(MatrixBase<Derived> &a, int n, int *indx, double b[]) {
     }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
     MatrixXf mat;
+    int p;
     int *indx;
     // load the matrix from the arguments
-    if (argc != 2) {
-        cout << "Usage: ./PCludcmp filename.mtx" << endl;
-        cout << "CSV or matrix market .mtx files are allowed, file extension must be correct" << endl;
+    if (argc != 3) {
+        cout << "Usage: ./PCludcmp filename.mtx NUM_THREADS" << endl;
+        cout << "CSV or matrix market .mtx files are allowed, file extension "
+                "must be correct"
+             << endl;
         return 1;
     }
     string filename = argv[1];
+    cout << "Threads: " << stoi(argv[2]) << endl;
+    p = stoi(argv[2]);
+    // set number of thread
+    omp_set_num_threads(p);
     string ext = filename.substr(filename.find_last_of(".") + 1);
-    transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c){ return std::tolower(c); });
+    transform(ext.begin(), ext.end(), ext.begin(),
+              [](unsigned char c) { return std::tolower(c); });
     if (ext == "csv") {
         mat = load_csv(filename);
     } else if (ext == "mtx") {
-       mat = read_matrix_market(filename);
+        mat = read_matrix_market(filename);
     } else {
         cout << "Usage: ./PCludcmp filename.mtx" << endl;
-        cout << "CSV or matrix market .mtx files are allowed, file extension must be correct" << endl;
+        cout << "CSV or matrix market .mtx files are allowed, file extension "
+                "must be correct"
+             << endl;
         cout << "Bad extension" << endl;
         return 1;
     }
     cout << "Starting timer" << endl;
     long n = mat.rows();
-    //boost::timer myTimer;
+    indx = new int[n];
+    // boost::timer myTimer;
     auto start = chrono::high_resolution_clock::now();
     PCludcmp(mat, n, indx);
     auto end = chrono::high_resolution_clock::now();
@@ -153,8 +163,10 @@ int main(int argc, char **argv) {
 
     cout << "Stopping timer" << endl;
     cout << "Time: " << duration.count() << endl;
-
+    //cout << mat.lu().matrixLU() << endl;
+    cout << mat << endl;
     return 0;
+
     // long n = (long)stoi(argv[1]);
     // MatrixXd a(n, n); // test matrix
     // int *indx = new int[n];

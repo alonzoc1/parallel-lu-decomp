@@ -1,32 +1,382 @@
-SIZE64ITER0
+SIZE64ITER0PROCS1
 Starting timer
 Stopping timer
-Time: 0.05245
-SIZE256ITER0
+Time: 0.007558
+SIZE64ITER0PROCS2
 Starting timer
 Stopping timer
-Time: 0.583879
-SIZE512ITER0
+Time: 0.006015
+SIZE64ITER0PROCS4
 Starting timer
 Stopping timer
-Time: 3.52319
-SIZE1024ITER0
+Time: 0.007181
+SIZE64ITER0PROCS8
 Starting timer
 Stopping timer
-Time: 26.2152
-SIZE64ITER0
+Time: 0.012859
+SIZE64ITER0PROCS16
 Starting timer
 Stopping timer
-Time: 0.017366
-SIZE256ITER0
+Time: 0.014132
+SIZE64ITER0PROCS32
 Starting timer
 Stopping timer
-Time: 0.133174
-SIZE512ITER0
+Time: 0.030369
+SIZE64ITER1PROCS1
 Starting timer
 Stopping timer
-Time: 0.630039
-SIZE1024ITER0
+Time: 0.005314
+SIZE64ITER1PROCS2
 Starting timer
 Stopping timer
-Time: 4.34012
+Time: 0.005605
+SIZE64ITER1PROCS4
+Starting timer
+Stopping timer
+Time: 0.006545
+SIZE64ITER1PROCS8
+Starting timer
+Stopping timer
+Time: 0.010755
+SIZE64ITER1PROCS16
+Starting timer
+Stopping timer
+Time: 0.020145
+SIZE64ITER1PROCS32
+Starting timer
+Stopping timer
+Time: 0.025523
+SIZE64ITER2PROCS1
+Starting timer
+Stopping timer
+Time: 0.005395
+SIZE64ITER2PROCS2
+Starting timer
+Stopping timer
+Time: 0.005416
+SIZE64ITER2PROCS4
+Starting timer
+Stopping timer
+Time: 0.006854
+SIZE64ITER2PROCS8
+Starting timer
+Stopping timer
+Time: 0.01311
+SIZE64ITER2PROCS16
+Starting timer
+Stopping timer
+Time: 0.022372
+SIZE64ITER2PROCS32
+Starting timer
+Stopping timer
+Time: 0.043082
+SIZE256ITER0PROCS1
+Starting timer
+Stopping timer
+Time: 0.32893
+SIZE256ITER0PROCS2
+Starting timer
+Stopping timer
+Time: 0.221254
+SIZE256ITER0PROCS4
+Starting timer
+Stopping timer
+Time: 0.135246
+SIZE256ITER0PROCS8
+Starting timer
+Stopping timer
+Time: 0.119552
+SIZE256ITER0PROCS16
+Starting timer
+Stopping timer
+Time: 0.149824
+SIZE256ITER0PROCS32
+Starting timer
+Stopping timer
+Time: 0.189377
+SIZE256ITER1PROCS1
+Starting timer
+Stopping timer
+Time: 0.316544
+SIZE256ITER1PROCS2
+Starting timer
+Stopping timer
+Time: 0.211798
+SIZE256ITER1PROCS4
+Starting timer
+Stopping timer
+Time: 0.13657
+SIZE256ITER1PROCS8
+Starting timer
+Stopping timer
+Time: 0.119353
+SIZE256ITER1PROCS16
+Starting timer
+Stopping timer
+Time: 0.133857
+SIZE256ITER1PROCS32
+Starting timer
+Stopping timer
+Time: 0.184414
+SIZE256ITER2PROCS1
+Starting timer
+Stopping timer
+Time: 0.318009
+SIZE256ITER2PROCS2
+Starting timer
+Stopping timer
+Time: 0.212403
+SIZE256ITER2PROCS4
+Starting timer
+Stopping timer
+Time: 0.136308
+SIZE256ITER2PROCS8
+Starting timer
+Stopping timer
+Time: 0.123716
+SIZE256ITER2PROCS16
+Starting timer
+Stopping timer
+Time: 0.138413
+SIZE256ITER2PROCS32
+Starting timer
+Stopping timer
+Time: 0.194277
+SIZE512ITER0PROCS1
+Starting timer
+Stopping timer
+Time: 2.52164
+SIZE512ITER0PROCS2
+Starting timer
+Stopping timer
+Time: 1.65505
+SIZE512ITER0PROCS4
+Starting timer
+Stopping timer
+Time: 0.997368
+SIZE512ITER0PROCS8
+Starting timer
+Stopping timer
+Time: 0.691489
+SIZE512ITER0PROCS16
+Starting timer
+Stopping timer
+Time: 0.668333
+SIZE512ITER0PROCS32
+Starting timer
+Stopping timer
+Time: 0.706413
+SIZE512ITER1PROCS1
+Starting timer
+Stopping timer
+Time: 2.61104
+SIZE512ITER1PROCS2
+Starting timer
+Stopping timer
+Time: 1.67789
+SIZE512ITER1PROCS4
+Starting timer
+Stopping timer
+Time: 0.970735
+SIZE512ITER1PROCS8
+Starting timer
+Stopping timer
+Time: 0.697978
+SIZE512ITER1PROCS16
+Starting timer
+Stopping timer
+Time: 0.629667
+SIZE512ITER1PROCS32
+Starting timer
+Stopping timer
+Time: 0.708434
+SIZE512ITER2PROCS1
+Starting timer
+Stopping timer
+Time: 2.57332
+SIZE512ITER2PROCS2
+Starting timer
+Stopping timer
+Time: 1.65549
+SIZE512ITER2PROCS4
+Starting timer
+Stopping timer
+Time: 0.990933
+SIZE512ITER2PROCS8
+Starting timer
+Stopping timer
+Time: 0.70051
+SIZE512ITER2PROCS16
+Starting timer
+Stopping timer
+Time: 0.644137
+SIZE512ITER2PROCS32
+Starting timer
+Stopping timer
+Time: 0.705925
+SIZE1024ITER0PROCS1
+Starting timer
+Stopping timer
+Time: 20.3999
+SIZE1024ITER0PROCS2
+Starting timer
+Stopping timer
+Time: 13.0075
+SIZE1024ITER0PROCS4
+Starting timer
+Stopping timer
+Time: 7.43847
+SIZE1024ITER0PROCS8
+Starting timer
+Stopping timer
+Time: 4.94991
+SIZE1024ITER0PROCS16
+Starting timer
+Stopping timer
+Time: 3.96875
+SIZE1024ITER0PROCS32
+Starting timer
+Stopping timer
+Time: 3.96453
+SIZE1024ITER1PROCS1
+Starting timer
+Stopping timer
+Time: 20.6645
+SIZE1024ITER1PROCS2
+Starting timer
+Stopping timer
+Time: 13.1069
+SIZE1024ITER1PROCS4
+Starting timer
+Stopping timer
+Time: 7.52556
+SIZE1024ITER1PROCS8
+Starting timer
+Stopping timer
+Time: 4.99712
+SIZE1024ITER1PROCS16
+Starting timer
+Stopping timer
+Time: 3.94131
+SIZE1024ITER1PROCS32
+Starting timer
+Stopping timer
+Time: 3.85096
+SIZE1024ITER2PROCS1
+Starting timer
+Stopping timer
+Time: 20.5835
+SIZE1024ITER2PROCS2
+Starting timer
+Stopping timer
+Time: 13.0179
+SIZE1024ITER2PROCS4
+Starting timer
+Stopping timer
+Time: 7.4291
+SIZE1024ITER2PROCS8
+Starting timer
+Stopping timer
+Time: 4.92936
+SIZE1024ITER2PROCS16
+Starting timer
+Stopping timer
+Time: 3.96823
+SIZE1024ITER2PROCS32
+Starting timer
+Stopping timer
+Time: 3.89833
+SIZE64ITER0PROCS1
+Starting timer
+Stopping timer
+Time: 0.009381
+SIZE64ITER0PROCS2
+Starting timer
+Stopping timer
+Time: 0.005969
+SIZE64ITER0PROCS4
+Starting timer
+Stopping timer
+Time: 0.006929
+SIZE64ITER0PROCS8
+Starting timer
+Stopping timer
+Time: 0.011712
+SIZE64ITER0PROCS16
+Starting timer
+Stopping timer
+Time: 0.020894
+SIZE64ITER0PROCS32
+Starting timer
+Stopping timer
+Time: 0.038699
+SIZE256ITER0PROCS1
+Starting timer
+Stopping timer
+Time: 0.322223
+SIZE256ITER0PROCS2
+Starting timer
+Stopping timer
+Time: 0.213014
+SIZE256ITER0PROCS4
+Starting timer
+Stopping timer
+Time: 0.135018
+SIZE256ITER0PROCS8
+Starting timer
+Stopping timer
+Time: 0.121881
+SIZE256ITER0PROCS16
+Starting timer
+Stopping timer
+Time: 0.137485
+SIZE256ITER0PROCS32
+Starting timer
+Stopping timer
+Time: 0.193966
+SIZE512ITER0PROCS1
+Starting timer
+Stopping timer
+Time: 2.53553
+SIZE512ITER0PROCS2
+Starting timer
+Stopping timer
+Time: 1.63125
+SIZE512ITER0PROCS4
+Starting timer
+Stopping timer
+Time: 0.966287
+SIZE512ITER0PROCS8
+Starting timer
+Stopping timer
+Time: 0.694837
+SIZE512ITER0PROCS16
+Starting timer
+SIZE512ITER0PROCS32
+Starting timer
+Stopping timer
+Time: 0.69606
+SIZE1024ITER0PROCS1
+Starting timer
+SIZE1024ITER0PROCS2
+Starting timer
+SIZE1024ITER0PROCS4
+Starting timer
+SIZE1024ITER0PROCS8
+Starting timer
+Stopping timer
+Time: 4.90963
+SIZE1024ITER0PROCS16
+Starting timer
+SIZE1024ITER0PROCS32
+Starting timer
+Stopping timer
+Time: 3.84512
+Starting timer
+Stopping timer
+Time: 0.007223
+Starting timer
+Stopping timer
+Time: 0.008683
+Usage: ./PCludcmp filename.mtx NUM_THREADS
+CSV or matrix market .mtx files are allowed, file extension must be correct

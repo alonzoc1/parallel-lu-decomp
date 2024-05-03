@@ -64,9 +64,12 @@ int main(int argc, char* argv[]) {
                     }
                 }
             } else if(test_type == "omp"){
-                system(("echo SIZE" + to_string(test_size) + "ITER" + to_string(iter_tracker) + " >> " + raw_filename).c_str());
-                if (system(("./PCludcmp " + build_test_data_filename(iter_tracker, test_size) + " >> " + raw_filename).c_str()) != 0) {
-                    cout << "One of the tests failed, exiting..." << endl;
+                int proc_counts[6] = {1, 2, 4, 8, 16, 32};
+                for(int proc_i = 0; proc_i < 6; proc_i++){
+                    system(("echo SIZE" + to_string(test_size) + "ITER" + to_string(iter_tracker) + "PROCS" + to_string(proc_counts[proc_i]) + " >> " + raw_filename).c_str());
+                    if (system(("./PCludcmp " + build_test_data_filename(iter_tracker, test_size) + " " + to_string(proc_counts[proc_i]) + " >> " + raw_filename).c_str()) != 0) {
+                        cout << "One of the tests failed, exiting..." << endl;
+                    }
                 }
             }
         }
