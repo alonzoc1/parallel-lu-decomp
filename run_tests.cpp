@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
                 int proc_counts[3] = {2, 4, 8};
                 for (int proc_i = 0; proc_i < 3; proc_i++) {
                     system(("echo SIZE" + to_string(test_size) + "ITER" + to_string(iter_tracker) + "PROCS" + to_string(proc_counts[proc_i]) + " >> " + raw_filename).c_str());
-                    if (system(("mpiexec -np " + to_string(proc_counts[proc_i]) + " ./gaussian_mpi " + build_test_data_filename(iter_tracker, test_size) + " " + to_string(test_size) + " >> " + raw_filename).c_str()) != 0) {
+                    if (system(("mpiexec -np " + to_string(proc_counts[proc_i]) + " -oversubscribe ./gaussian_mpi " + build_test_data_filename(iter_tracker, test_size) + " " + to_string(test_size) + " >> " + raw_filename).c_str()) != 0) {
                         cout << "One of the tests failed, exiting..." << endl;
                     }
                 }
