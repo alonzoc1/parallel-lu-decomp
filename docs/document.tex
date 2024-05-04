@@ -12,8 +12,10 @@
 \usepackage{physics}
 \usepackage{MnSymbol}
 \usepackage{float}
-
 \usepackage{listings} %for listings of the source code
+\usepackage[backend=biber]{biblatex}
+\addbibresource{document.bib}
+\nocite{*}
 
 % Some definitions for using the listing package.
 % When we reference 'codegreen', it will be the RGB color defined below.
@@ -254,6 +256,8 @@ int main(){
     \caption{}
     \label{fig:efficiency-mpi}
 \end{figure}
+
+\printbibliography
 
 
 \end{document}
