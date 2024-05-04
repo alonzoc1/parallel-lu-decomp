@@ -240,18 +240,21 @@ int main(){
 }
 \end{lstlisting}
 \subsection{Performance and Results}
-
-\begin{figure}
+    The parallel Gaussian implementation was run at a \(1, 2, 4, 8, 16\) and \(32\) process counts using MPI, and with randomly generated square matrices sized \(64, 256, 512,\) and \(1024\). The matrices were generated such that they were gauranteed to be invertible. We also wrote a seperate serial only Gaussian implementation to validate our outputs and compare correctness, as it was difficult to achieve correct results particularly at larger matrix sizes. This is likely due to a combination of incorrectly implementing the algorithm in the parallel code and testing on matrices that are not stable with Gaussian LU decomposition.
+\par
+    As for the performance, using figures \ref{fig:speed-up-mpi} and \ref{fig:efficiency-mpi} we can see that up to \(4\) processes we achieve speedups nearly equal to the number of processes. Efficiency does appear to go over \(1\) slightly for the \(2\) process run due to the poor performance when running the MPI version of the algorithm with a single process. Generally, the observed performance up to 4 processes is indicative of potential issues in the implementation, especially when comparing the correctness. As we increase the process count to 16, we see a decrease in performance for small size matrices, as the overhead in setting up all the processes outweighs any benefit. For larger matrices, performance levels off after 8 processes due to the aforementioned hardware limitations of the Tuckoo environment.
+\pagebreak
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=0.9\linewidth]{"Speed-Up vs. Processes"}
-    \caption{}
+    \caption{Speed-Up per number of processors per problem size. n is the dimensions of the square \(n \times n\) matrix}
     \label{fig:speed-up-mpi}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[width=0.9\linewidth]{"Efficiency vs. Processes"}
-    \caption{}
+    \caption{Efficiency per number of processors per problem size. n is the dimensions of the square \(n \times n\) matrix}
     \label{fig:efficiency-mpi}
 \end{figure}
 
