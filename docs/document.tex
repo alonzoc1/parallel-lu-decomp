@@ -50,7 +50,9 @@
     backgroundcolor=\color{backcolour},
     tabsize=2,
     breaklines=true,
-    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+    numbers=left,
+    numbersep=5pt
 }
 
 \hypersetup{%
@@ -98,7 +100,12 @@ LU-decomposition is a popular method of solving a linear system of equations wit
 Two popular algorithms for LU decomposition are Crout's and Gauss-Elimination.
 
 \section{Crout's Algorithm}
-   This method solves for the upper triangular part of the LU decomposition in a ``$\righthalfcup$" shape. It first computes the upper triangular part then then uses those values to create the lower triangular part. The algorithm iterates through columns of the matrix, going down each row of the column. This method is depicted in figure \ref{fig:crout}. The algorithm is ``in place'' with each iteration replacing the data in \(A\) with the LU decomposition. This is illustrated in equation \ref{lu-matrix}
+   This method solves for the upper triangular part of the LU decomposition in a ``$\righthalfcup$" shape. It first computes the upper triangular part then then uses those values to create the lower triangular part. The algorithm iterates through columns of the matrix, going down each row of the column. The algoritms solves equations \ref{beta} and \ref{alpha}. This method is depicted in figure \ref{fig:crout}. The algorithm is ``in place'' with each iteration replacing the data in \(A\) with the LU decomposition. This is illustrated in equation \ref{lu-matrix}
+
+\begin{align}
+   \beta_{ij} = a_{ij} - \sum_{k=1}^{i-1} \alpha_{ik}\beta_{kj} \label{beta} \\
+   \alpha_{ij} = {1 \over \beta_{jj}} \left(a_{ij} - \sum_{k=1}^{j-1} \alpha_{ik}\beta_{kj}\right) \label{alpha}
+\end{align}
 
    \begin{align}\label{lu-matrix}
    	\mqty[\xmat*{a}{4}{4}] \rightarrow  \mqty[\beta_{11} & \beta_{12} & \beta_{13} & \beta_{14} \\
@@ -109,21 +116,20 @@ Two popular algorithms for LU decomposition are Crout's and Gauss-Elimination.
 
    \begin{figure}[H]
    	\centering
-   	\includegraphics[width=0.7\linewidth]{"../../../../../Desktop/Screenshot 2024-05-02 at 7.55.50 PM"}
-%   	\caption{}
+   	\includegraphics[width=0.7\linewidth]{"Screenshot 2024-05-02 at 7.55.50 PM"}
+    \caption{Numerical Recipes in C 2nd Edition}
    	\label{fig:crout}
    \end{figure}
 
 
-	\subsection{Parallelization}
+	\subsection{Parallelization OpenMP}
 	We decided to apply parallelization to the Numerical Recipes version of the Crouts's algorithm. The parallelization of this algorithm is fairly straight forward with OpenMP. We parallelized over the inner loops that go through the rows of each column. This was the best way to parallelized with OpenMP because it minimizes communication between threads. If we had parallelized over the main loop that iterates over the columns, we would have had to pass messages between threads because we need the all the columns \(< j\) to build the \(j^{th}\) column. The code for the openMP parallelization is shown below.
 
     \lstset{caption={Crout's algorithm parallelize with OpenMP. Adapted from Numerical Recipes}}
      \begin{lstlisting}
 #pragma omp parallel for default(none) private(i, big) shared(scaling, a, n)
 for (i = 0; i < n; i++) {
-// Find the max abs(value) of each row
-// detect if matrix is singular
+// Find the max abs(value) of each row and detect if matrix is singular
     big = a.row(i).cwiseAbs().maxCoeff();
     if (big == 0.0) {
         printf("Singular matrix in routine ludcmp");
@@ -143,7 +149,7 @@ for (j = 0; j < n; j++) {
   		a(i, j) = sum;
   	}
   	// continue to build upper triangular part from i = j up to n rows
- #pragma omp parallel for default(none) private(i, sum, k) shared(a, j, n, big, imax, cout) schedule(dynamic)
+ #pragma omp parallel for default(none) private(i, sum, k) shared(a, j, n, cout)
   	for (i = j; i < n; i++) {
   		sum = a(i, j);
   		for (k = 0; k < j; k++)
@@ -173,7 +179,7 @@ for (j = 0; j < n; j++) {
       }
   	if (j != n - 1) {
   		dum = (1.0 / a(j, j));
-  		// this last part build lower triangular part using the values we calculated above
+  		// build lower triangular part using the values we calculated above
 #pragma omp parallel for default(none) private(i, k) shared(j, n, a, dum)
   		for (i = j + 1; i < n; i++)
   		a(i, j) *= dum;
@@ -181,11 +187,73 @@ for (j = 0; j < n; j++) {
   }
     \end{lstlisting}
 
-The first loop simply finds the max absolute value of each row and stores it for future use. The first 2 loops use a dynamic scheduling because the number of iterations in the inner loops depend on the outer index; therefore threads with larger assigned indices will do less iterations. The pivoting part was left in serial because the conditional statement needs to be run by a single thread at a time to ensure the last thread to update imax is the thread with the max value. The swapping of the rows is also easier to handle in serial.
+The first loop simply finds the max absolute value of each row and stores it for future use. The first loop uses a dynamic scheduling because the number of iterations in the inner loops depend on the outer index; therefore threads with larger assigned indices will do less iterations. The pivoting part was left in serial because the conditional statement needs to be run by a single thread at a time to ensure the last thread to update imax is the thread with the max value. The swapping of the rows is also easier to handle in serial.
+
+One problem I ran into was the if-statement checking for the index of the pivot. Originally, these statement was inside the \(i=j\) loop inside an omp critical region. This caused a bug in the code where the output would sometimes be wrong. After extracting the if-statement to its own unparalleled loop, the code worked again consistently. The problem could have been that imax was not always the index of the global max value, but instead the index of the max value of the last thread that updated it.
 
 \subsection{Performance and Results}
-The code was tested against Eigen's C++ Library LU decomposition algorithm for correctness with random matrices. The times were also measured using random matrices of size \(64, 256, 512,\) and \(1024\). LU decomposition was performed 3 times on each matrix and the max time was recorded.
-\section*{Problem 2}
- I use \href{http://texstudio.sourceforge.net/}{\TeX studio}, but \href{https://www.overleaf.com/project}{Overleaf} and \href{https://www.xm1math.net/texmaker/}{\TeX maker} are also popular.
+The code was tested against Eigen's C++ Library LU decomposition and the serial version of the above code for correctness with random matrices. The times were also measured using random matrices of size \(64, 256, 512,\) and \(1024\). LU decomposition was performed 3 times on each matrix and the minimum time was recorded. The results can be seen in figures \ref{fig:speed-up-vs} and \ref{fig:efficiency-vs}. Overall, there was a noticeable speed-up in the parallel version. Since Tuckoo's CPU have 16 cores each, it makes sense that 16 is the optimal thread count. The efficiency follows an expected downward path. The smallest n value has the steepest curve while the largest n has the highest efficiency. Since Tuckoo's CPU do not have 32 physical threads, there is dramatic decrease of both speed-up and efficiency at 32 threads. Despite this, data before 32 meets our expectations of increase efficiency with increase problem size. Similarly, speed-up is more drastic with bigger problem but flattens out quickly with small problems.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{"Speed-Up vs. Threads"}
+    \caption{Speed-Up per number of processors per problem size. n is the dimensions of the square \(n \times n\) matrix}
+    \label{fig:speed-up-vs}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{"Efficiency vs. Threads"}
+    \caption{Efficiency per number of processors per problem size. n is the dimensions of the square \(n \times n\) matrix}
+    \label{fig:efficiency-vs}
+\end{figure}
+
+
+\section{Gauss-Elimination}
+The second method we tested was Gauss-Elimination. This methods uses a series of row-operations to generate L and U.  The algorithm first finds a pivot for column \(i\), scales it by the pivot, then subtracts the \(i+1\) row. For Gaussian's MPI implementation, we ran into issues with sending and receiving the data within Eigen data, which is the library we used to represent our matrices. Firstly, Eigen matrices are more complex data structures than MPI natively supports. For any communication to happen we have to ensure that we are extracting native C arrays and sending those instead. Eigen does have a Matrix.row(number).data() function that can be used for this purpose. The next issue was that Eigen by default stores data internally in column major order, which means data is stored such that columns are traversed before rows. I experimented with storing the data in Row Major order, but it only caused issues on the data ingestion and didn't seem to improve accuracy or performance, but there is some impact there that can be explored. Finally, we ran into an issue with the allocation of memory between processes. Our data loader (matrix\_reader.cpp) dynamically reads in a CSV file and allocates the memory space using a dynamically sized matrix object on the fly. This approach, by default, is not going to work for broadcasting data between processes for MPI. We solved this by requiring size as an input for the Gaussian MPI program, and pre-allocating the space in each process before ingesting the data into the allocated space.
+
+\lstset{caption={Gauss-Elimination MPI}}
+\begin{lstlisting}
+for (int k = 0; k < n; ++k) {
+// broadcast current pivot row if its my turn
+MPI_Bcast(mat.row(k).data(), n, MPI_FLOAT, k % procs, MPI_COMM_WORLD);
+
+    for (int i = k + 1; i < n; ++i) {
+        if (i % procs == rank) {
+            double factor = mat(i, k) / mat(k, k);
+                for (int j = k; j < n; ++j) {
+                    mat(i, j) -= factor * mat(k, j);
+                }
+                mat(i, k) = factor;
+        }
+    }
+}
+
+int main(){
+    // give data to processes
+    MPI_Bcast(mat.data(), n*n, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    // run it!
+    lu_parallel(rank, procs, mat, n);
+    // gather, send and recieve are the same buffer for rank 0 so skip it with MPI_IN_PLACE
+    MPI_Gather(mat.data(), (n*n) / procs, MPI_FLOAT, mat.data(), (n*n) / procs, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    // print result
+}
+\end{lstlisting}
+\subsection{Performance and Results}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{"Speed-Up vs. Processes"}
+    \caption{}
+    \label{fig:speed-up-mpi}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{"Efficiency vs. Processes"}
+    \caption{}
+    \label{fig:efficiency-mpi}
+\end{figure}
+
 
 \end{document}

@@ -8,6 +8,8 @@
 #include "Eigen/Dense"
 #include <cmath>
 #include <iostream>
+#include <chrono>
+#include "matrix_reader.h"
 #define PI 3.1415926
 
 using namespace std;
@@ -95,29 +97,67 @@ void backsub(MatrixBase<Derived> &a, int n, int *indx, double b[]) {
     }
 }
 
-int main(int argc, char **argv) {
-    long n = (long)stoi(argv[1]);
-    MatrixXd a(n, n); // test matrix
-    // initParallel();
+int main(int argc, char* argv[]) {
+    // double b[] = {2 * PI, 5 * PI, -8 * PI};
+    //double b[] = {1, 1, -2, -2};
+
+     MatrixXf mat;
+    // load the matrix from the arguments
+    if (argc != 2) {
+        cout << "Usage: ./PCludcmp filename.mtx NUM_THREADS" << endl;
+        cout << "CSV or matrix market .mtx files are allowed, file extension "
+                "must be correct"
+             << endl;
+        return 1;
+    }
+    string filename = argv[1];
+    //cout << "Threads: " << stoi(argv[2]) << endl;  
+    string ext = filename.substr(filename.find_last_of(".") + 1);
+    transform(ext.begin(), ext.end(), ext.begin(),
+              [](unsigned char c) { return std::tolower(c); });
+    if (ext == "csv") {
+        mat = load_csv(filename);
+    } else if (ext == "mtx") {
+        mat = read_matrix_market(filename);
+    } else {
+        cout << "Usage: ./PCludcmp filename.mtx" << endl;
+        cout << "CSV or matrix market .mtx files are allowed, file extension "
+                "must be correct"
+             << endl;
+        cout << "Bad extension" << endl;
+        return 1;
+    }
+    cout << "Starting timer" << endl;
+    long n = mat.rows();
     int *indx = new int[n];
-    //double b[] = {2 * PI, 5 * PI, -8 * PI};
-	double b[] = {1, 1, -2, -2};
+    // boost::timer myTimer;
+    auto start = chrono::high_resolution_clock::now();
+   // SCludcmp(mat, n, indx);
+    auto end = chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+
+    cout << "Stopping timer" << endl;
+    cout << "Time: " << duration.count() << endl;
+    cout << mat.lu().matrixLU() << endl;
+    //cout << mat << endl;
+    return 0;
     // init matrix
-   // a << 1.0, 2.0, -1.0, 6.0, -5.0, 4.0, -9.0, 8.0, -7.0;
-   a << 1, 0, 0, 1, 3, 2, 1, 0, 0, 0, 0, -1, 0, -1, 0, -2;
+    // a << 1.0, 2.0, -1.0, 6.0, -5.0, 4.0, -9.0, 8.0, -7.0;
+    //a << 1, 0, 0, 1, 3, 2, 1, 0, 0, 0, 0, -1, 0, -1, 0, -2;
     // a = MatrixXd::Random(n, n);
-    // a = a + (MatrixXd::Constant(n, n, 1) *
-    //          100.0); // random n x n matrix doubles between -100, 100
-    //  cout << a << endl;
-    //  cout << a.lu().matrixLU() << endl; // print eigen's lu decomp partial
-    //  pivot
-    printf("\n");
-    // in place LU decomp from Eigen for testing.
-    // PartialPivLU<Ref<RowMajorMatrixXd>> lu(a);
-    // cout << a.col(1).maxCoeff(&index) << " index" << index << endl;
-    SCludcmp(a, n, indx);
-    cout << a << endl; // print our version
-    backsub(a, n, indx, b);
+    // // a = a + (MatrixXd::Constant(n, n, 1) *
+    // //          100.0); // random n x n matrix doubles between -100, 100
+    // //  cout << a << endl;
+    // //  cout << a.lu().matrixLU() << endl; // print eigen's lu decomp partial
+    // //  pivot
+    // printf("\n");
+    // // in place LU decomp from Eigen for testing.
+    // // PartialPivLU<Ref<RowMajorMatrixXd>> lu(a);
+    // // cout << a.col(1).maxCoeff(&index) << " index" << index << endl;
+    // SCludcmp(a, n, indx);
+    // cout << a << endl; // print our version
+    // //backsub(a, n, indx, b);
+    // cout << b << endl;
 
     return 0;
 }
