@@ -2,124 +2,59 @@ SIZE64ITER0
 Starting timer
 Stopping timer
 Correct: Yes
-Time: 0.009632
+Time: 0.01901
 SIZE64ITER1
 Starting timer
 Stopping timer
 Correct: Yes
-Time: 0.009658
+Time: 0.019019
 SIZE64ITER2
 Starting timer
 Stopping timer
 Correct: Yes
-Time: 0.010184
-SIZE64ITER3
-Starting timer
-Stopping timer
-Correct: Yes
-Time: 0.009748
-SIZE64ITER4
-Starting timer
-Stopping timer
-Correct: Yes
-Time: 0.009539
+Time: 0.019036
 SIZE256ITER0
 Starting timer
 Stopping timer
 Correct: No
-Time: 0.628215
+Time: 1.19357
 SIZE256ITER1
 Starting timer
 Stopping timer
 Correct: No
-Time: 0.617366
+Time: 1.19334
 SIZE256ITER2
 Starting timer
 Stopping timer
 Correct: No
-Time: 0.630153
-SIZE256ITER3
-Starting timer
-Stopping timer
-Correct: No
-Time: 0.63184
-SIZE256ITER4
-Starting timer
-Stopping timer
-Correct: No
-Time: 0.634992
+Time: 1.19343
 SIZE512ITER0
 Starting timer
 Stopping timer
 Correct: No
-Time: 5.04078
+Time: 9.55365
 SIZE512ITER1
 Starting timer
 Stopping timer
 Correct: No
-Time: 5.15023
+Time: 9.55458
 SIZE512ITER2
 Starting timer
 Stopping timer
 Correct: No
-Time: 5.07184
-SIZE512ITER3
-Starting timer
-Stopping timer
-Correct: No
-Time: 5.13217
-SIZE512ITER4
-Starting timer
-Stopping timer
-Correct: No
-Time: 4.95843
+Time: 9.55488
 SIZE1024ITER0
 Starting timer
 Stopping timer
 Correct: No
-Time: 41.0862
+Time: 76.2804
 SIZE1024ITER1
 Starting timer
 Stopping timer
 Correct: No
-Time: 39.8715
+Time: 76.4144
 SIZE1024ITER2
 Starting timer
 Stopping timer
 Correct: No
-Time: 39.2042
-SIZE1024ITER3
-Starting timer
-Stopping timer
-Correct: No
-Time: 39.051
-SIZE1024ITER4
-Starting timer
-Stopping timer
-Correct: No
-Time: 39.3346
-SIZE2048ITER0
-Starting timer
-Stopping timer
-Correct: No
-Time: 317.34
-SIZE2048ITER1
-Starting timer
-Stopping timer
-Correct: No
-Time: 318.693
-SIZE2048ITER2
-Starting timer
-Stopping timer
-Correct: No
-Time: 317.756
-SIZE2048ITER3
-Starting timer
-Stopping timer
-Correct: No
-Time: 342.982
-SIZE2048ITER4
-Starting timer
-Stopping timer
-Correct: No
-Time: 352.783
+Time: 76.4962
