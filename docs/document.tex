@@ -116,7 +116,7 @@ Two popular algorithms for LU decomposition are Crout's and Gauss-Elimination.
 
    \begin{figure}[H]
    	\centering
-   	\includegraphics[width=0.7\linewidth]{"/Users/raul/Desktop/Screenshot 2024-05-02 at 7.55.50 PM"}
+   	\includegraphics[width=0.7\linewidth]{"Screenshot 2024-05-02 at 7.55.50 PM"}
     \caption{Numerical Recipes in C 2nd Edition}
    	\label{fig:crout}
    \end{figure}
@@ -129,8 +129,7 @@ Two popular algorithms for LU decomposition are Crout's and Gauss-Elimination.
      \begin{lstlisting}
 #pragma omp parallel for default(none) private(i, big) shared(scaling, a, n)
 for (i = 0; i < n; i++) {
-// Find the max abs(value) of each row
-// detect if matrix is singular
+// Find the max abs(value) of each row and detect if matrix is singular
     big = a.row(i).cwiseAbs().maxCoeff();
     if (big == 0.0) {
         printf("Singular matrix in routine ludcmp");
@@ -150,7 +149,7 @@ for (j = 0; j < n; j++) {
   		a(i, j) = sum;
   	}
   	// continue to build upper triangular part from i = j up to n rows
- #pragma omp parallel for default(none) private(i, sum, k) shared(a, j, n, big, imax, cout)
+ #pragma omp parallel for default(none) private(i, sum, k) shared(a, j, n, cout)
   	for (i = j; i < n; i++) {
   		sum = a(i, j);
   		for (k = 0; k < j; k++)
@@ -180,7 +179,7 @@ for (j = 0; j < n; j++) {
       }
   	if (j != n - 1) {
   		dum = (1.0 / a(j, j));
-  		// this last part build lower triangular part using the values we calculated above
+  		// build lower triangular part using the values we calculated above
 #pragma omp parallel for default(none) private(i, k) shared(j, n, a, dum)
   		for (i = j + 1; i < n; i++)
   		a(i, j) *= dum;
@@ -197,19 +196,64 @@ The code was tested against Eigen's C++ Library LU decomposition and the serial 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{"../../../../../../Downloads/Speed-Up vs. Threads"}
+    \includegraphics[width=0.9\linewidth]{"Speed-Up vs. Threads"}
     \caption{Speed-Up per number of processors per problem size. n is the dimensions of the square \(n \times n\) matrix}
     \label{fig:speed-up-vs}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{"../../../../../../Downloads/Efficiency vs. Threads"}
+    \includegraphics[width=0.9\linewidth]{"Efficiency vs. Threads"}
     \caption{Efficiency per number of processors per problem size. n is the dimensions of the square \(n \times n\) matrix}
     \label{fig:efficiency-vs}
 \end{figure}
 
 
-\section*{Gauss-Elimination}
+\section{Gauss-Elimination}
 The second method we tested was Gauss-Elimination. This methods uses a series of row-operations to generate L and U.  The algorithm first finds a pivot for column \(i\), scales it by the pivot, then subtracts the \(i+1\) row. For Gaussian's MPI implementation, we ran into issues with sending and receiving the data within Eigen data, which is the library we used to represent our matrices. Firstly, Eigen matrices are more complex data structures than MPI natively supports. For any communication to happen we have to ensure that we are extracting native C arrays and sending those instead. Eigen does have a Matrix.row(number).data() function that can be used for this purpose. The next issue was that Eigen by default stores data internally in column major order, which means data is stored such that columns are traversed before rows. I experimented with storing the data in Row Major order, but it only caused issues on the data ingestion and didn't seem to improve accuracy or performance, but there is some impact there that can be explored. Finally, we ran into an issue with the allocation of memory between processes. Our data loader (matrix\_reader.cpp) dynamically reads in a CSV file and allocates the memory space using a dynamically sized matrix object on the fly. This approach, by default, is not going to work for broadcasting data between processes for MPI. We solved this by requiring size as an input for the Gaussian MPI program, and pre-allocating the space in each process before ingesting the data into the allocated space.
+
+\lstset{caption={Gauss-Elimination MPI}}
+\begin{lstlisting}
+for (int k = 0; k < n; ++k) {
+// broadcast current pivot row if its my turn
+MPI_Bcast(mat.row(k).data(), n, MPI_FLOAT, k % procs, MPI_COMM_WORLD);
+
+    for (int i = k + 1; i < n; ++i) {
+        if (i % procs == rank) {
+            double factor = mat(i, k) / mat(k, k);
+                for (int j = k; j < n; ++j) {
+                    mat(i, j) -= factor * mat(k, j);
+                }
+                mat(i, k) = factor;
+        }
+    }
+}
+
+int main(){
+    // give data to processes
+    MPI_Bcast(mat.data(), n*n, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    // run it!
+    lu_parallel(rank, procs, mat, n);
+    // gather, send and recieve are the same buffer for rank 0 so skip it with MPI_IN_PLACE
+    MPI_Gather(mat.data(), (n*n) / procs, MPI_FLOAT, mat.data(), (n*n) / procs, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    // print result
+}
+\end{lstlisting}
+\subsection{Performance and Results}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{"Speed-Up vs. Processes"}
+    \caption{}
+    \label{fig:speed-up-mpi}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{"Efficiency vs. Processes"}
+    \caption{}
+    \label{fig:efficiency-mpi}
+\end{figure}
+
+
 \end{document}
