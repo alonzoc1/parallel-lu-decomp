@@ -1,0 +1,32 @@
+SIZE64ITER0
+Starting timer
+Stopping timer
+Time: 0.05245
+SIZE256ITER0
+Starting timer
+Stopping timer
+Time: 0.583879
+SIZE512ITER0
+Starting timer
+Stopping timer
+Time: 3.52319
+SIZE1024ITER0
+Starting timer
+Stopping timer
+Time: 26.2152
+SIZE64ITER0
+Starting timer
+Stopping timer
+Time: 0.017366
+SIZE256ITER0
+Starting timer
+Stopping timer
+Time: 0.133174
+SIZE512ITER0
+Starting timer
+Stopping timer
+Time: 0.630039
+SIZE1024ITER0
+Starting timer
+Stopping timer
+Time: 4.34012
